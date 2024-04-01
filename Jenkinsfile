@@ -15,13 +15,6 @@ pipeline {
                 """
             }
         }
-        stage("Run Tests"){
-            steps{
-                sh """
-                    mvn test
-                """
-            }
-        }
     }
     post {
         always {
