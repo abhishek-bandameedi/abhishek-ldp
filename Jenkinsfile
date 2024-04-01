@@ -10,15 +10,8 @@ pipeline {
         stage("Build"){
             steps {
                   sh """
-                    cd /var/lib/jenkins/workspace/final-assignment/kafka/final-Assignment/producer &&
+                    cd /var/lib/jenkins/workspace/kafka_final_assignment/final_assignment/producer &&
                     mvn clean package
-                """
-            }
-        }
-        stage("Run Tests"){
-            steps{
-                sh """
-                    mvn test
                 """
             }
         }
