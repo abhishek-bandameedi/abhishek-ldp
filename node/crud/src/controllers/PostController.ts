@@ -1,64 +1,96 @@
-import { Request, Response } from 'express';
-import Post from '../models/Post';
+import { Request, Response, NextFunction } from "express";
+import Post from "../models/Post";
+import PostNotFoundException from "../exceptions/PostNotFoundException";
 
-export const createPost = async (req: Request, res: Response) => {
+export const createPost = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const post = await Post.create(req.body);
-    return res.status(201).json(post);
+    res.status(201).json(post);
   } catch (error) {
-    return res.status(500).json({ error: 'Internal Server Error' });
+    next(error);
   }
 };
 
-export const getPosts = async (req: Request, res: Response) => {
+export const getPosts = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    const posts = await Post.findAll();
-    return res.status(200).json(posts);
+    const page = parseInt(req.query.page as string,10) || 1;
+    const size = parseInt(req.query.size as string,10) || 10;
+
+    const offset = (page - 1) * size;
+    const limit = size;
+
+    const {count, rows:posts} = await Post.findAndCountAll({
+        offset,
+        limit,
+        include:['user'],
+    })
+    res.status(200).json({
+        totalItems: count,
+        totalPages: Math.ceil(count/size),
+        currentPage: page,
+        posts,
+    });
   } catch (error) {
-    return res.status(500).json({ error: 'Internal Server Error' });
+    next(error);
   }
 };
 
-export const getPostById = async (req: Request, res: Response) => {
-  const { id } = req.params;
+export const getPostById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    const post = await Post.findByPk(id);
+    const post = await Post.findByPk(req.params.id, { include: ["user"] });
     if (!post) {
-      return res.status(404).json({ error: 'Post not found' });
+      throw new PostNotFoundException(req.params.id);
     }
-    return res.status(200).json(post);
+    res.status(200).json(post);
   } catch (error) {
-    return res.status(500).json({ error: 'Internal Server Error' });
+    next(error);
   }
 };
 
-export const updatePost = async (req: Request, res: Response) => {
-  const { id } = req.params;
+export const updatePost = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    const [updated] = await Post.update(req.body, {
-      where: { id: id }
-    });
-    if (updated) {
-      const updatedPost = await Post.findByPk(id);
-      return res.status(200).json(updatedPost);
+    const post = await Post.findByPk(req.params.id);
+    if (!post) {
+      throw new PostNotFoundException(req.params.id);
     }
-    throw new Error('Post not found');
+    post.title = req.body.title;
+    post.content = req.body.content;
+    await post.save();
+    res.status(200).json(post);
   } catch (error) {
-    return res.status(500).json({ error: 'Internal Server Error' });
+    next(error);
   }
 };
 
-export const deletePost = async (req: Request, res: Response) => {
-  const { id } = req.params;
+export const deletePost = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    const deleted = await Post.destroy({
-      where: { id: id }
-    });
-    if (deleted) {
-      return res.status(204).send('Post deleted');
+    const post = await Post.findByPk(req.params.id);
+    if (!post) {
+      throw new PostNotFoundException(req.params.id);
     }
-    throw new Error('Post not found');
+    await post.destroy();
+    res.status(200).json({ message: "Post deleted successfully" });
   } catch (error) {
-    return res.status(500).json({ error: 'Internal Server Error' });
+    next(error);
   }
 };
