@@ -10,7 +10,7 @@ https://www.figma.com/proto/YnrJYr7uKzClRLBgfEwTg5/Checkr-Golden-Path-(Bootcamp)
 
 
 ## DB Design
-![DB DESIGN](image.png)
+![DB Design](image.png)
 
 ## API swagger documentation
 https://app.swaggerhub.com/apis/ABHISHEKBANDAMEEDI/Abhishek/1.0.0#/
