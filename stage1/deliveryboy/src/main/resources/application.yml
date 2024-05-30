@@ -1,0 +1,29 @@
+server:
+  port: 8080
+spring:
+  kafka:
+    bootstrap-servers: pkc-12576z.us-west2.gcp.confluent.cloud:9092
+    properties:
+      schema:
+        registry:
+          url: https://psrc-j98yq.us-central1.gcp.confluent.cloud
+      basic:
+        auth:
+          credentials:
+            source: USER_INFO
+          user:
+            info: HUWCVWWXTI47IYXX:X8wtj5W0lJq5CRaI3v3iN8C/HZxFejUYFWG1kxt2+HpOd2Bk7EusiEndpEgnptVH
+      sasl:
+        jaas:
+          config: org.apache.kafka.common.security.plain.PlainLoginModule
+            required username="DDFIRXIOY6QBURCT" password="a57NSjQYUwVJeSEwt7A5cQ4G9qzCFsqFiiExHABGbqrvuh+CAKksB+7hin3qmD0d";
+        mechanism: PLAIN
+      security:
+        protocol: SASL_SSL
+      ssl:
+        endpoint:
+          identification:
+            algorithm: https
+    producer:
+      keySerializer: org.apache.kafka.common.serialization.StringSerializer
+      valueSerializer: org.apache.kafka.common.serialization.StringSerializer
